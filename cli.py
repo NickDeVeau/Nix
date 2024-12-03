@@ -14,8 +14,6 @@ def run_program(file_path):
     
     executor = Executor(ast)
     executor.execute()
-    
-    return executor.variables
 
 if __name__ == "__main__":
     import sys
@@ -24,5 +22,4 @@ if __name__ == "__main__":
         sys.exit(1)
     
     file_path = sys.argv[1]
-    variables = run_program(file_path)
-    print("Final variable states:", variables)
+    run_program(file_path)

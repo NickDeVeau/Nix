@@ -10,10 +10,12 @@ class Lexer:
             ('WHILE', r'\bwhile\b'),
             ('DEF', r'\bdef\b'),
             ('RETURN', r'\breturn\b'),
+            ('PRINT', r'\bprint\b'),  # Add 'PRINT' keyword
             ('NUMBER', r'\d+'),
+            ('STRING', r'"[^"]*"|\'[^\']*\''),  # Add support for single-quoted strings
             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-            ('OP', r'[+\-*/<>]'),  # Include arithmetic and comparison operators
-            ('ASSIGN', r'='),
+            ('ASSIGN', r'='),  # Ensure ASSIGN is identified before OP
+            ('OP', r'[+\-*/<>!=]'),  # Include '!' for '!=' operator
             ('LPAREN', r'\('),
             ('RPAREN', r'\)'),
             ('LBRACE', r'\{'),
@@ -21,6 +23,7 @@ class Lexer:
             ('COMMA', r','),
             ('SEMICOLON', r';'),
             ('WHITESPACE', r'\s+'),
+            ('UNKNOWN', r'.'),  # Catch-all for unknown characters
         ]))
 
     def tokenize(self):
@@ -30,9 +33,13 @@ class Lexer:
             kind = match.lastgroup
             value = match.group()
             column = match.start() - line_start + 1
-            if kind != 'WHITESPACE':
+            if kind == 'WHITESPACE':
+                if '\n' in value:  # Handle line breaks
+                    line_number += value.count('\n')
+                    line_start = match.end()
+                continue  # Skip whitespace
+            elif kind == 'UNKNOWN':
+                raise SyntaxError(f"Unknown character '{value}' at line {line_number}, column {column}")
+            else:
                 self.tokens.append((kind, value, line_number, column))
-            if '\n' in value:  # Handle line breaks
-                line_number += 1
-                line_start = match.end()
         return self.tokens

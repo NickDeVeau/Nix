@@ -17,8 +17,9 @@ class Parser:
             return self.if_statement()
         elif self.match('WHILE'):
             return self.while_statement()
+        elif self.match('PRINT'):  # Handle 'print' statements
+            return self.print_statement()
         elif self.match('IDENTIFIER'):
-            # Distinguish function calls from assignments
             if self.position + 1 < len(self.tokens) and self.tokens[self.position + 1][0] == 'LPAREN':
                 return self.function_call()
             else:
@@ -33,6 +34,14 @@ class Parser:
         else:
             token = self.tokens[self.position] if self.position < len(self.tokens) else ('EOF', 'end of file')
             raise SyntaxError(f"Unknown statement starting with {token[0]} ('{token[1]}')")
+
+    def print_statement(self):
+        self.consume('PRINT')
+        self.consume('LPAREN')
+        expr = self.expression()
+        self.consume('RPAREN')
+        self.consume('SEMICOLON')
+        return ('print', expr)
 
     def if_statement(self):
         self.consume('IF')
@@ -126,10 +135,11 @@ class Parser:
     def primary(self):
         if self.match('NUMBER'):
             return ('number', self.consume('NUMBER'))
+        elif self.match('STRING'):  # Handle string literals
+            return ('string', self.consume('STRING'))
         elif self.match('IDENTIFIER'):
             identifier = self.consume('IDENTIFIER')
             if self.match('LPAREN'):
-                # Function call within an expression
                 self.consume('LPAREN')
                 arguments = []
                 if not self.match('RPAREN'):
@@ -150,8 +160,7 @@ class Parser:
             return expr
         else:
             token = self.tokens[self.position] if self.position < len(self.tokens) else ('EOF', 'end of file')
-            raise SyntaxError(f"Expected number, identifier, or '(', but found {token[0]} ('{token[1]}')")
-
+            raise SyntaxError(f"Expected number, string, identifier, or '(', but found {token[0]} ('{token[1]}')")
 
     def match(self, kind):
         if self.position < len(self.tokens) and self.tokens[self.position][0] == kind:

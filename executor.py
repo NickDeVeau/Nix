@@ -11,7 +11,6 @@ class Executor:
         for statement in statements:
             result = self.execute_statement(statement)
             if result is not None:
-                # Return the result up the call stack if it's a function return value
                 return result
 
     def execute_statement(self, statement):
@@ -29,7 +28,9 @@ class Executor:
         elif kind == 'function':
             self.execute_function_declaration(statement)
         elif kind == 'call':
-            self.execute_function_call(statement)
+            return self.execute_function_call(statement)
+        elif kind == 'print':
+            self.execute_print(statement)
         elif kind == 'return':
             return self.evaluate_expression(statement[1])
         else:
@@ -68,24 +69,30 @@ class Executor:
         parameters, body = self.functions[name]
         if len(arguments) != len(parameters):
             raise RuntimeError(f"Argument count mismatch for function: {name}")
-        # Save current variables to handle variable scope
         old_variables = self.variables.copy()
-        # Set up new variable scope
         self.variables = old_variables.copy()
         for param, arg in zip(parameters, arguments):
             self.variables[param] = self.evaluate_expression(arg)
-        # Execute function body
         result = self.execute_statements(body)
-        # Restore previous variable scope
         self.variables = old_variables
         return result
+
+    def execute_print(self, statement):
+        _, expr = statement
+        value = self.evaluate_expression(expr)
+        print(value)
 
     def evaluate_expression(self, expression):
         kind = expression[0]
         if kind == 'number':
             return int(expression[1])
+        elif kind == 'string':
+            return expression[1][1:-1]
         elif kind == 'identifier':
-            return self.variables.get(expression[1], 0)
+            if expression[1] in self.variables:
+                return self.variables[expression[1]]
+            else:
+                raise RuntimeError(f"Undefined variable: {expression[1]}")
         elif kind == 'binary':
             operator = expression[1]
             left = self.evaluate_expression(expression[2])
@@ -112,6 +119,13 @@ class Executor:
                 return left <= right
             else:
                 raise RuntimeError(f"Unknown operator: {operator}")
+        elif kind == 'unary':
+            operator = expression[1]
+            operand = self.evaluate_expression(expression[2])
+            if operator == '-':
+                return -operand
+            else:
+                raise RuntimeError(f"Unknown unary operator: {operator}")
         elif kind == 'call':
             return self.execute_function_call(expression)
         else:
