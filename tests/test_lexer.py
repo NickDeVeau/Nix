@@ -1,5 +1,5 @@
 import unittest
-from lexer import Lexer
+from nix.lexer import Lexer
 
 class TestLexer(unittest.TestCase):
     def test_basic_tokens(self):

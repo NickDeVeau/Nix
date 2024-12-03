@@ -1,0 +1,15 @@
+setup.py
+nix/__init__.py
+nix/cli.py
+nix/executor.py
+nix/lexer.py
+nix/parser.py
+nix.egg-info/PKG-INFO
+nix.egg-info/SOURCES.txt
+nix.egg-info/dependency_links.txt
+nix.egg-info/entry_points.txt
+nix.egg-info/top_level.txt
+tests/test_executor.py
+tests/test_interpreter.py
+tests/test_lexer.py
+tests/test_parser.py

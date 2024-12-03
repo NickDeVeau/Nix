@@ -1,6 +1,6 @@
 import unittest
-from lexer import Lexer
-from parser import Parser
+from nix.lexer import Lexer
+from nix.parser import Parser
 
 class TestParser(unittest.TestCase):
     def test_arithmetic_expression(self):

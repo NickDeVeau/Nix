@@ -1,8 +1,7 @@
-
 import unittest
-from lexer import Lexer
-from parser import Parser
-from executor import Executor
+from nix.lexer import Lexer
+from nix.parser import Parser
+from nix.executor import Executor
 
 class TestExecutor(unittest.TestCase):
     def test_arithmetic_execution(self):
