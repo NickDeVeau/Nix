@@ -1,3 +1,4 @@
+README.md
 setup.py
 nix/__init__.py
 nix/cli.py
